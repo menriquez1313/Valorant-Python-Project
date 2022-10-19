@@ -9,7 +9,7 @@ import requests
 
 response = requests.get("") #ACCOUNT-V1 
 val_status = requests.get("") #VAL-STATUS-v1
-val_content = requests.get("") #VAL-CONENT-V1
+val_content = requests.get("") #VAL-CONTENT-V1
 val_ranked = requests.get("") #VAL-RANKED-V1
 
 data = response.json()
@@ -40,14 +40,22 @@ def user_info_status():
 def valorant_status():
     val_status.raise_for_status()
     maintenances = data_val_status["maintenances"]
-    content = data_val_status["incidents"][0]["updates"][0]["translations"][0]["content"]
-    incident_severity = data_val_status["incidents"][0]["incident_severity"]
     
-    print("//////////////////////////////")
-    print(f"Maintenances: {maintenances}")
-    print(f"Updates: {content}")
-    print(f"Incident: {incident_severity}")
-    print("//////////////////////////////")
+    if len(data_val_status["incidents"]) == 0: #checks if there is any incidents in the dictionary by counting content in the dictionary
+        print("//////////////////////////////")
+        print("Currently no information for incidents")
+        print("//////////////////////////////")
+    
+    else:
+           
+        content = data_val_status["incidents"][0]["updates"][0]["translations"][0]["content"]
+        incident_severity = data_val_status["incidents"][0]["incident_severity"]
+    
+        print("//////////////////////////////")
+        print(f"Maintenances: {maintenances}")
+        print(f"Updates: {content}")
+        print(f"Incident: {incident_severity}")
+        print("//////////////////////////////")
     
 #fix this to automatically update the Epiode/ACT
 def current_act_info():
@@ -69,13 +77,47 @@ def current_act_info():
         print(f"Leaderboard Rank: {leaderboardRank}")
         print(f"Wins: {wins}")
     print("------------------------------------")
+
+#All Agents   
+def current_agents():
+    val_content.raise_for_status()
     
+    print("------------------------------------")
+    n=0 #counter
+    for i in range(len(data_val_content["characters"])):
+        
+        agents = data_val_content["characters"][i]["name"]
+        if agents == "Null UI Data!":
+            pass
+        else:
+            n+=1
+            print(f"{n}.{agents}")
+    print("------------------------------------")
+
+def current_maps():
+    val_content.raise_for_status()
+    
+    print("------------------------------------")
+    n=0 # counter 
+    for i in range(len(data_val_content["maps"])):
+            
+        maps = data_val_content["maps"][i]["name"]
+        if maps == "Null UI Data!":
+            pass
+        else:
+            n+=1
+            print(f"{n}.{maps}")
+    print("------------------------------------")
+
+#body
 on = True
 while on == True:
     print("/////////Welcome to VALORANT info///////")
     print("1: User and locale")
     print("2: Update/Status on Valorant")
     print("3: Current Act Info")
+    print("4: Current Agents")
+    print("5: Current Maps")
     print("0: Exit")
     choose = int(input("What info would you like to know?: "))
     
@@ -88,6 +130,12 @@ while on == True:
         print("\n")
     elif choose == 3:
         current_act_info()
+        print("\n")
+    elif choose == 4:
+        current_agents()
+        print("\n")
+    elif choose == 5:
+        current_maps()
         print("\n")
     elif choose == 0:
         print("//////////////////////////////")
