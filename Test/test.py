@@ -3,19 +3,35 @@ Created October 10, 2022
 
 This is a test using the Valorant API
 
+
+https://numpy.org/doc/ 
 """
 
-import requests
 
-response = requests.get("") #ACCOUNT-V1 
-val_status = requests.get("") #VAL-STATUS-v1
-val_content = requests.get("") #VAL-CONTENT-V1
-val_ranked = requests.get("") #VAL-RANKED-V1
+KEY = ""
+
+import requests
+import pandas
+import numpy as np
+
+response = requests.get(f"key={KEY}") #ACCOUNT-V1 
+val_status = requests.get(f"key={KEY}") #VAL-STATUS-v1
+val_content = requests.get(f"key={KEY}") #VAL-CONTENT-V1
+val_ranked = requests.get(f"key={KEY}") #VAL-RANKED-V1
+
 
 data = response.json()
 data_val_status = val_status.json()
 data_val_content = val_content.json()
 data_val_ranked = val_ranked.json()
+
+##### Calculations #######
+#finding average
+def average(num1, num2):
+    avg = round((((abs(num1 - num2)) / ((num1 + num2) / 2)) * 100), 2)
+    return avg
+
+##########################
 
 #Gives out basic info of User
 def user_info_status():
@@ -108,7 +124,40 @@ def current_maps():
             n+=1
             print(f"{n}.{maps}")
     print("------------------------------------")
+    
 
+#Using a test sample file "data.csv" to output information from ranked games
+def rank_games():
+    rank_info = pandas.read_csv("valorant_data_sample.csv")
+    print(rank_info)
+    
+    #calculate average of kills, deaths, and assists
+    kill_count = rank_info["Kills"].tolist()
+    death_count = rank_info["Deaths"].tolist()
+    assist_count = rank_info["Assists"].tolist()
+    
+    kill_average = np.average(kill_count)
+    death_average = np.average(death_count)
+    assist_average = np.average(assist_count)
+    
+    #percentage difference of the last and second to last game
+    # kill_perc = ((abs(kill_count[0] - kill_count[1])) / ((kill_count[0] + kill_count[1]) / 2)) * 100
+    # death_perc = ((abs(death_count[0] - death_count[1])) / ((death_count[0] + death_count[1]) / 2)) * 100
+    # assist_perc = ((abs(assist_count[0] - assist_count[1])) / ((assist_count[0] + assist_count[1]) / 2)) * 100
+    
+    kill_perc = average(kill_count[0], kill_count[1])
+    death_perc = average(death_count[0], death_count[1])
+    assist_perc = average(assist_count[0], assist_count[1])
+    
+    #print info
+    print("--------------------------------------------------------")
+    print(f"Average Kill: {kill_average}")
+    print(f"Average Death: {death_average}")
+    print(f"Average Assist: {assist_average}")
+    print("--------------------------------------------------------")
+    print("Percentage Differance of your last two games:")
+    print(f"K: {kill_perc}%\nD: {death_perc}%\nA: {assist_perc}%")
+    
 #body
 on = True
 while on == True:
@@ -118,9 +167,9 @@ while on == True:
     print("3: Current Act Info")
     print("4: Current Agents")
     print("5: Current Maps")
+    print("6: Ranked Games")
     print("0: Exit")
     choose = int(input("What info would you like to know?: "))
-    
     
     if choose == 1:
         user_info_status()
@@ -137,10 +186,13 @@ while on == True:
     elif choose == 5:
         current_maps()
         print("\n")
+    elif choose == 6:
+        rank_games()
+        print("\n")   
     elif choose == 0:
         print("//////////////////////////////")
         print("///////GLHF on your Games!/////")
-        on = False
         print("//////////////////////////////")
+        on = False
     else:
         print("Please enter a number showed on the list.")
